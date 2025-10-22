@@ -6,7 +6,7 @@ from typing import Optional
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from utils.volume_control import VolumeController
+from utils.browser_control import BrowserController
 
 
 class SpeakerController:
@@ -20,7 +20,7 @@ class SpeakerController:
         self.audio_dir = None
         self.boo_sound = None
         self.happy_halloween_sound = None
-        self.volume_controller = VolumeController()
+        self.browser_controller = BrowserController()
 
     def discover_and_connect(self, device_address: Optional[str] = None):
         """
@@ -102,16 +102,15 @@ class SpeakerController:
             print("HAPPY HALLOWEEN! 🎃")
             return
 
-        # Save current volume and duck it way down
-        print("Ducking system volume...")
-        self.volume_controller.save_state()
-        self.volume_controller.set_volume(0.05)  # Drop to 5% (barely audible)
+        # Mute all browser tabs (Chrome, Safari)
+        print("Muting browser tabs...")
+        self.browser_controller.mute_all_browsers()
 
-        await asyncio.sleep(0.2)  # Brief moment for volume to adjust
+        await asyncio.sleep(0.3)  # Brief moment for muting to take effect
 
         print("Playing BOO sound at MAX VOLUME...")
-        # Play BOO sound at MAXIMUM volume - will dominate
-        self.boo_sound.set_volume(1.0)  # MAX VOLUME regardless of multiplier
+        # Play BOO sound at MAXIMUM volume
+        self.boo_sound.set_volume(1.0)
         self.boo_sound.play()
 
         # Wait for BOO to finish
@@ -124,16 +123,16 @@ class SpeakerController:
 
         print("Playing Happy Halloween at MAX VOLUME...")
         # Play Happy Halloween at MAXIMUM volume
-        self.happy_halloween_sound.set_volume(1.0)  # MAX VOLUME
+        self.happy_halloween_sound.set_volume(1.0)
         self.happy_halloween_sound.play()
 
         # Wait for Happy Halloween to finish
         while pygame.mixer.get_busy():
             await asyncio.sleep(0.1)
 
-        # Restore original volume
-        print("Restoring system volume...")
-        self.volume_controller.restore_state()
+        # Unmute browser tabs
+        print("Unmuting browser tabs...")
+        self.browser_controller.unmute_all_browsers()
 
         print("Scare sequence complete - your ambient music continues")
 
