@@ -97,6 +97,9 @@ class ScareBoxController:
         # Start streaming
         self.stream_manager.start_streaming()
 
+        # Reinitialize speaker (in case it was stopped or device changed)
+        self.speaker.initialize()
+
         # Start ambient effects
         intensity = self._get_intensity_multipliers()
         self.ambient_task = asyncio.create_task(self.lights.set_ambient_pattern())
