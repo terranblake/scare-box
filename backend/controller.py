@@ -241,20 +241,30 @@ class ScareBoxController:
             # Update timing
             if key == "countdown_duration":
                 self.state_machine.update_timing(countdown_duration=value)
+                self.config.timing.countdown_duration = value
             elif key == "active_duration":
                 self.state_machine.update_timing(active_duration=value)
+                self.config.timing.active_duration = value
             elif key == "reset_duration":
                 self.state_machine.update_timing(reset_duration=value)
+                self.config.timing.reset_duration = value
+            elif key == "scream_delay":
+                self.scream_delay = value
+                self.config.timing.scream_delay = value
 
             # Update audio settings
             elif key == "trigger_frequency_min":
                 self.microphone.trigger_freq_min = value
+                self.config.audio.trigger_frequency_min = value
             elif key == "trigger_frequency_max":
                 self.microphone.trigger_freq_max = value
+                self.config.audio.trigger_frequency_max = value
             elif key == "trigger_amplitude_threshold":
                 self.microphone.trigger_threshold = value
-            elif key == "scream_delay":
-                self.scream_delay = value
+                self.config.audio.trigger_amplitude_threshold = value
+
+        # Save config to disk
+        self.config.save_to_file()
 
     def get_config(self) -> dict:
         """Get current configuration."""
