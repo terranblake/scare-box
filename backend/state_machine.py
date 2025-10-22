@@ -36,7 +36,7 @@ class StateMachine:
     def __init__(
         self,
         countdown_duration: float = 3.0,
-        active_duration: float = 2.0,
+        active_duration: float = 4.0,
         reset_duration: float = 5.0,
     ):
         self.countdown_duration = countdown_duration
