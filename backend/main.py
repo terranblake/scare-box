@@ -42,6 +42,9 @@ async def startup_event():
 
     await controller.initialize()
 
+    # Auto-start the system (enables microphone listening and streaming)
+    await controller.start()
+
     print("\n🎃 Scare Box ready!")
     print(f"   API: http://{config.server.host}:{config.server.port}/api")
     print(f"   WebSocket: ws://{config.server.host}:{config.server.port}/ws")

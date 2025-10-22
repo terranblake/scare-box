@@ -6,7 +6,7 @@ from typing import Optional
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from utils.browser_control import BrowserController
+from utils.chrome_media_control import pause_chrome_media, resume_chrome_media
 
 
 class SpeakerController:
@@ -20,7 +20,6 @@ class SpeakerController:
         self.audio_dir = None
         self.boo_sound = None
         self.happy_halloween_sound = None
-        self.browser_controller = BrowserController()
 
     def discover_and_connect(self, device_address: Optional[str] = None):
         """
@@ -102,11 +101,10 @@ class SpeakerController:
             print("HAPPY HALLOWEEN! 🎃")
             return
 
-        # Mute all browser tabs (Chrome, Safari)
-        print("Muting browser tabs...")
-        self.browser_controller.mute_all_browsers()
+        # Pause Chrome media using pynput media keys
+        pause_chrome_media()
 
-        await asyncio.sleep(0.3)  # Brief moment for muting to take effect
+        await asyncio.sleep(0.5)  # Brief moment for pause to take effect
 
         print("Playing BOO sound at MAX VOLUME...")
         # Play BOO sound at MAXIMUM volume
@@ -130,9 +128,8 @@ class SpeakerController:
         while pygame.mixer.get_busy():
             await asyncio.sleep(0.1)
 
-        # Unmute browser tabs
-        print("Unmuting browser tabs...")
-        self.browser_controller.unmute_all_browsers()
+        # Resume Chrome media using pynput media keys
+        resume_chrome_media()
 
         print("Scare sequence complete - your ambient music continues")
 

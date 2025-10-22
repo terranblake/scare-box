@@ -1,5 +1,6 @@
 """Event logging and tracking system."""
 
+import asyncio
 import time
 from typing import List, Optional, Callable
 from dataclasses import dataclass, asdict
@@ -75,7 +76,10 @@ class EventLogger:
         # Notify callbacks
         for callback in self.callbacks:
             try:
-                callback(event)
+                # Handle both sync and async callbacks
+                result = callback(event)
+                if asyncio.iscoroutine(result):
+                    asyncio.create_task(result)
             except Exception as e:
                 print(f"Error in event callback: {e}")
 

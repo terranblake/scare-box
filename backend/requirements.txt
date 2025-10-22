@@ -10,3 +10,4 @@ sounddevice>=0.4.6
 lifxlan>=1.2.7
 bleak>=0.20.0
 pygame>=2.5.0
+pynput>=1.7.6

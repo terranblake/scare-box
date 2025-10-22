@@ -144,7 +144,10 @@ class StateMachine:
         """Notify all registered callbacks."""
         for callback in self.state_change_callbacks:
             try:
-                callback(event)
+                # Handle both sync and async callbacks
+                result = callback(event)
+                if asyncio.iscoroutine(result):
+                    asyncio.create_task(result)
             except Exception as e:
                 print(f"Error in state change callback: {e}")
 
