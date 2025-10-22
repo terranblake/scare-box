@@ -40,6 +40,7 @@ class ScareBoxController:
         self.is_running = False
         self.ambient_task: Optional[asyncio.Task] = None
         self.light_stream_task: Optional[asyncio.Task] = None
+        self.scream_delay = config.timing.scream_delay
 
         # Register callbacks
         self._setup_callbacks()
@@ -187,7 +188,7 @@ class ScareBoxController:
             # Execute scare
             await self.speaker.play_scare_sequence(
                 volume_multiplier=intensity["volume"],
-                scream_delay=self.config.timing.scream_delay
+                scream_delay=self.scream_delay
             )
             self.lights.trigger_flash(intensity["brightness"])
 
@@ -252,6 +253,8 @@ class ScareBoxController:
                 self.microphone.trigger_freq_max = value
             elif key == "trigger_amplitude_threshold":
                 self.microphone.trigger_threshold = value
+            elif key == "scream_delay":
+                self.scream_delay = value
 
     def get_config(self) -> dict:
         """Get current configuration."""
@@ -267,6 +270,7 @@ class ScareBoxController:
                 "countdown_duration": self.state_machine.countdown_duration,
                 "active_duration": self.state_machine.active_duration,
                 "reset_duration": self.state_machine.reset_duration,
+                "scream_delay": self.scream_delay,
             },
         }
 

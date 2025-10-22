@@ -21,6 +21,7 @@ export default function ConfigPanel({ onClose }: ConfigPanelProps) {
   const [countdownDuration, setCountdownDuration] = useState(3.0);
   const [activeDuration, setActiveDuration] = useState(2.0);
   const [resetDuration, setResetDuration] = useState(5.0);
+  const [screamDelay, setScreamDelay] = useState(2.0);
 
   // Device selection
   const { data: availableDevices } = useApi<{
@@ -40,6 +41,7 @@ export default function ConfigPanel({ onClose }: ConfigPanelProps) {
       setCountdownDuration(config.timing.countdown_duration);
       setActiveDuration(config.timing.active_duration);
       setResetDuration(config.timing.reset_duration);
+      setScreamDelay(config.timing.scream_delay);
     }
   }, [config]);
 
@@ -85,6 +87,7 @@ export default function ConfigPanel({ onClose }: ConfigPanelProps) {
         countdown_duration: countdownDuration,
         active_duration: activeDuration,
         reset_duration: resetDuration,
+        scream_delay: screamDelay,
       });
       await refetch();
       setMessage({ type: 'success', text: 'Configuration saved successfully' });
@@ -324,6 +327,24 @@ export default function ConfigPanel({ onClose }: ConfigPanelProps) {
                   step="1"
                 />
                 <div className="text-xs text-gray-500 mt-1">Time to return to normal</div>
+              </div>
+
+              {/* Scream Delay */}
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">
+                  Scream Delay (seconds)
+                </label>
+                <input
+                  type="number"
+                  value={screamDelay}
+                  onChange={(e) => setScreamDelay(Number(e.target.value))}
+                  disabled={saving}
+                  className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:border-orange-500 focus:outline-none disabled:opacity-50"
+                  min="0"
+                  max="10"
+                  step="0.1"
+                />
+                <div className="text-xs text-gray-500 mt-1">Delay between BOO and Happy Halloween</div>
               </div>
             </div>
           </div>

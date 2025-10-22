@@ -13,6 +13,7 @@ class ConfigUpdate(BaseModel):
     countdown_duration: Optional[float] = None
     active_duration: Optional[float] = None
     reset_duration: Optional[float] = None
+    scream_delay: Optional[float] = None
 
 
 class ModeUpdate(BaseModel):

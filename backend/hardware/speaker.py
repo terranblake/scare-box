@@ -104,8 +104,6 @@ class SpeakerController:
         # Pause Chrome media using pynput media keys
         pause_chrome_media()
 
-        await asyncio.sleep(0.5)  # Brief moment for pause to take effect
-
         print("Playing BOO sound at MAX VOLUME...")
         # Play BOO sound at MAXIMUM volume
         self.boo_sound.set_volume(1.0)
