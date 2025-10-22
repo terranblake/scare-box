@@ -102,15 +102,15 @@ class SpeakerController:
             print("HAPPY HALLOWEEN! 🎃")
             return
 
-        # Save and duck the system volume (makes your music quieter)
-        print("Ducking ambient music volume...")
-        self.volume_controller.save_volume()
-        self.volume_controller.duck_volume(duck_amount=0.2)  # Reduce to 20%
+        # Save current audio state and MUTE your music completely
+        print("Muting ambient music...")
+        self.volume_controller.save_state()
+        self.volume_controller.mute()
 
-        await asyncio.sleep(0.3)  # Brief moment for volume to adjust
+        await asyncio.sleep(0.2)  # Brief moment for mute to take effect
 
         print("Playing BOO sound...")
-        # Play BOO sound (this will now be louder than your ducked music)
+        # Play BOO sound (your music is now SILENT)
         self.boo_sound.set_volume(volume_multiplier)
         self.boo_sound.play()
 
@@ -119,11 +119,11 @@ class SpeakerController:
             await asyncio.sleep(0.1)
 
         print(f"Pausing {scream_delay}s for screams...")
-        # Delay for screams/reactions
+        # Delay for screams/reactions (music still muted)
         await asyncio.sleep(scream_delay)
 
         print("Playing Happy Halloween...")
-        # Play Happy Halloween
+        # Play Happy Halloween (music still muted)
         self.happy_halloween_sound.set_volume(volume_multiplier)
         self.happy_halloween_sound.play()
 
@@ -131,9 +131,9 @@ class SpeakerController:
         while pygame.mixer.get_busy():
             await asyncio.sleep(0.1)
 
-        # Restore original volume (your music returns to normal)
-        print("Restoring ambient music volume...")
-        self.volume_controller.restore_volume()
+        # Restore original audio state (unmute your music)
+        print("Unmuting ambient music...")
+        self.volume_controller.restore_state()
 
         print("Scare sequence complete - your ambient music continues")
 
