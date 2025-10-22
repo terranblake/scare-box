@@ -12,9 +12,25 @@ export default function ConfigPanel({ onClose }: ConfigPanelProps) {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  // Audio settings
+  const [triggerFreqMin, setTriggerFreqMin] = useState(800);
+  const [triggerFreqMax, setTriggerFreqMax] = useState(1200);
+  const [triggerThreshold, setTriggerThreshold] = useState(0.3);
+
+  // Timing settings
+  const [countdownDuration, setCountdownDuration] = useState(3.0);
+  const [activeDuration, setActiveDuration] = useState(2.0);
+  const [resetDuration, setResetDuration] = useState(5.0);
+
   useEffect(() => {
     if (config) {
       setMode(config.mode);
+      setTriggerFreqMin(config.audio.trigger_frequency_min);
+      setTriggerFreqMax(config.audio.trigger_frequency_max);
+      setTriggerThreshold(config.audio.trigger_amplitude_threshold);
+      setCountdownDuration(config.timing.countdown_duration);
+      setActiveDuration(config.timing.active_duration);
+      setResetDuration(config.timing.reset_duration);
     }
   }, [config]);
 
@@ -43,6 +59,28 @@ export default function ConfigPanel({ onClose }: ConfigPanelProps) {
       setMessage({ type: 'success', text: `System ${action === 'start' ? 'started' : 'stopped'}` });
     } catch (err) {
       setMessage({ type: 'error', text: err instanceof Error ? err.message : `Failed to ${action}` });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSaveConfig = async () => {
+    setSaving(true);
+    setMessage(null);
+
+    try {
+      await apiPut('/api/config', {
+        trigger_frequency_min: triggerFreqMin,
+        trigger_frequency_max: triggerFreqMax,
+        trigger_amplitude_threshold: triggerThreshold,
+        countdown_duration: countdownDuration,
+        active_duration: activeDuration,
+        reset_duration: resetDuration,
+      });
+      await refetch();
+      setMessage({ type: 'success', text: 'Configuration saved successfully' });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to save configuration' });
     } finally {
       setSaving(false);
     }
@@ -136,42 +174,132 @@ export default function ConfigPanel({ onClose }: ConfigPanelProps) {
           </div>
         </div>
 
-        {/* Current Configuration */}
-        {config && (
-          <div className="md:col-span-2">
-            <h3 className="text-lg font-semibold mb-4">Current Configuration</h3>
-            <div className="bg-gray-800 rounded-lg p-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                <div>
-                  <div className="text-gray-400 mb-1">Trigger Frequency Range</div>
-                  <div className="font-mono">
-                    {config.audio.trigger_frequency_min} - {config.audio.trigger_frequency_max} Hz
-                  </div>
-                </div>
-                <div>
-                  <div className="text-gray-400 mb-1">Trigger Threshold</div>
-                  <div className="font-mono">{config.audio.trigger_amplitude_threshold}</div>
-                </div>
-                <div>
-                  <div className="text-gray-400 mb-1">Sample Rate</div>
-                  <div className="font-mono">{config.audio.sample_rate} Hz</div>
-                </div>
-                <div>
-                  <div className="text-gray-400 mb-1">Countdown Duration</div>
-                  <div className="font-mono">{config.timing.countdown_duration}s</div>
-                </div>
-                <div>
-                  <div className="text-gray-400 mb-1">Active Duration</div>
-                  <div className="font-mono">{config.timing.active_duration}s</div>
-                </div>
-                <div>
-                  <div className="text-gray-400 mb-1">Reset Duration</div>
-                  <div className="font-mono">{config.timing.reset_duration}s</div>
-                </div>
+        {/* Audio Settings */}
+        <div className="md:col-span-2">
+          <h3 className="text-lg font-semibold mb-4">Audio Trigger Settings</h3>
+          <div className="bg-gray-800 rounded-lg p-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">
+                  Trigger Frequency Min (Hz)
+                </label>
+                <input
+                  type="number"
+                  value={triggerFreqMin}
+                  onChange={(e) => setTriggerFreqMin(Number(e.target.value))}
+                  disabled={saving}
+                  className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:border-orange-500 focus:outline-none disabled:opacity-50"
+                  min="0"
+                  max="2000"
+                  step="50"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">
+                  Trigger Frequency Max (Hz)
+                </label>
+                <input
+                  type="number"
+                  value={triggerFreqMax}
+                  onChange={(e) => setTriggerFreqMax(Number(e.target.value))}
+                  disabled={saving}
+                  className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:border-orange-500 focus:outline-none disabled:opacity-50"
+                  min="0"
+                  max="2000"
+                  step="50"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">
+                  Trigger Threshold (0.0-1.0)
+                </label>
+                <input
+                  type="number"
+                  value={triggerThreshold}
+                  onChange={(e) => setTriggerThreshold(Number(e.target.value))}
+                  disabled={saving}
+                  className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:border-orange-500 focus:outline-none disabled:opacity-50"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                />
+              </div>
+            </div>
+            {config && (
+              <div className="mt-3 text-xs text-gray-500">
+                Sample Rate: {config.audio.sample_rate} Hz (read-only)
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Timing Settings */}
+        <div className="md:col-span-2">
+          <h3 className="text-lg font-semibold mb-4">Timing Settings</h3>
+          <div className="bg-gray-800 rounded-lg p-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">
+                  Countdown Duration (seconds)
+                </label>
+                <input
+                  type="number"
+                  value={countdownDuration}
+                  onChange={(e) => setCountdownDuration(Number(e.target.value))}
+                  disabled={saving}
+                  className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:border-orange-500 focus:outline-none disabled:opacity-50"
+                  min="0"
+                  max="30"
+                  step="0.5"
+                />
+                <div className="text-xs text-gray-500 mt-1">Time before scare triggers</div>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">
+                  Active Duration (seconds)
+                </label>
+                <input
+                  type="number"
+                  value={activeDuration}
+                  onChange={(e) => setActiveDuration(Number(e.target.value))}
+                  disabled={saving}
+                  className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:border-orange-500 focus:outline-none disabled:opacity-50"
+                  min="0"
+                  max="30"
+                  step="0.5"
+                />
+                <div className="text-xs text-gray-500 mt-1">Duration of scare effects</div>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">
+                  Reset Duration (seconds)
+                </label>
+                <input
+                  type="number"
+                  value={resetDuration}
+                  onChange={(e) => setResetDuration(Number(e.target.value))}
+                  disabled={saving}
+                  className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:border-orange-500 focus:outline-none disabled:opacity-50"
+                  min="0"
+                  max="60"
+                  step="1"
+                />
+                <div className="text-xs text-gray-500 mt-1">Time to return to normal</div>
               </div>
             </div>
           </div>
-        )}
+        </div>
+
+        {/* Save Button */}
+        <div className="md:col-span-2">
+          <button
+            onClick={handleSaveConfig}
+            disabled={saving}
+            className="w-full px-6 py-3 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-700 disabled:text-gray-500 rounded-lg font-medium transition"
+          >
+            {saving ? 'Saving...' : 'Save Configuration'}
+          </button>
+        </div>
       </div>
     </div>
   );
