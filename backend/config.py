@@ -18,7 +18,7 @@ class AudioConfig(BaseModel):
 
 class TimingConfig(BaseModel):
     """Timing configuration for scare sequences."""
-    countdown_duration: float = 3.0
+    countdown_duration: float = 0.0  # Instant trigger - no delay
     active_duration: float = 4.0  # Increased to allow full scare sequence (BOO + pause + Happy Halloween)
     reset_duration: float = 5.0
     scream_delay: float = 2.0
