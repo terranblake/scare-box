@@ -67,6 +67,7 @@ class MicrophoneController:
             return
 
         self.is_listening = True
+        loop = asyncio.get_event_loop()
 
         def audio_callback(indata, frames, time_info, status):
             """Process audio chunk in callback."""
@@ -81,7 +82,8 @@ class MicrophoneController:
                 # Handle both sync and async callbacks
                 result = callback(analysis)
                 if asyncio.iscoroutine(result):
-                    asyncio.create_task(result)
+                    # Run coroutine in the main event loop (cross-thread)
+                    asyncio.run_coroutine_threadsafe(result, loop)
 
             # Check for trigger
             if analysis.triggered:
