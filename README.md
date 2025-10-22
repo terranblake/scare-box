@@ -4,6 +4,8 @@
 
 A web-controlled Halloween scare system with synchronized audio, lighting, and atmospheric effects. Control everything from your phone or laptop with real-time monitoring and manual triggers.
 
+https://github.com/user-attachments/assets/0cce78f0-bcf4-485d-9ef2-c15b00aa6448
+
 [![Tests](https://img.shields.io/badge/tests-18%20passed-brightgreen)]() [![Python](https://img.shields.io/badge/python-3.9+-blue)]() [![TypeScript](https://img.shields.io/badge/typescript-5.2+-blue)]()
 
 ## Overview
