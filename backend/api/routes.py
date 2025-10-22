@@ -157,11 +157,12 @@ async def get_speaker_status():
 
 @router.get("/devices/available")
 async def get_available_devices():
-    """Get list of available audio input devices."""
+    """Get list of available audio input and output devices."""
     import sounddevice as sd
 
     devices = sd.query_devices()
     input_devices = []
+    output_devices = []
 
     for i, device in enumerate(devices):
         if device['max_input_channels'] > 0:
@@ -171,8 +172,15 @@ async def get_available_devices():
                 "channels": device['max_input_channels'],
                 "sample_rate": device['default_samplerate'],
             })
+        if device['max_output_channels'] > 0:
+            output_devices.append({
+                "id": i,
+                "name": device['name'],
+                "channels": device['max_output_channels'],
+                "sample_rate": device['default_samplerate'],
+            })
 
-    return {"microphones": input_devices}
+    return {"microphones": input_devices, "speakers": output_devices}
 
 
 @router.put("/devices/microphone")
@@ -193,6 +201,42 @@ async def set_microphone_device(request: dict):
 
         return SuccessResponse(success=True, message=f"Microphone changed to {device_name}")
     except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.put("/devices/speaker")
+async def set_speaker_device(request: dict):
+    """Change the speaker/audio output device."""
+    if not controller:
+        raise HTTPException(status_code=500, detail="Controller not initialized")
+
+    device_name = request.get("device_name")
+    if not device_name:
+        raise HTTPException(status_code=400, detail="device_name required")
+
+    # Reinitialize speaker with new device
+    try:
+        import pygame
+
+        # Quit current mixer
+        pygame.mixer.quit()
+
+        # Reinitialize with new device
+        pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=512, devicename=device_name)
+
+        # Reload audio files
+        controller.speaker._load_audio_files()
+
+        print(f"Speaker changed to: {device_name}")
+
+        return SuccessResponse(success=True, message=f"Speaker changed to {device_name}")
+    except Exception as e:
+        # Try to reinitialize with default device if change fails
+        try:
+            pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=512)
+            controller.speaker._load_audio_files()
+        except:
+            pass
         raise HTTPException(status_code=500, detail=str(e))
 
 

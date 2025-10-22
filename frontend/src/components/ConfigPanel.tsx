@@ -23,9 +23,13 @@ export default function ConfigPanel({ onClose }: ConfigPanelProps) {
   const [resetDuration, setResetDuration] = useState(5.0);
 
   // Device selection
-  const { data: availableDevices } = useApi<{ microphones: Array<{ id: number; name: string; channels: number; sample_rate: number }> }>('/api/devices/available');
+  const { data: availableDevices } = useApi<{
+    microphones: Array<{ id: number; name: string; channels: number; sample_rate: number }>;
+    speakers: Array<{ id: number; name: string; channels: number; sample_rate: number }>;
+  }>('/api/devices/available');
   const { data: currentDevices } = useApi<any>('/api/devices');
   const [selectedMicrophone, setSelectedMicrophone] = useState<string>('');
+  const [selectedSpeaker, setSelectedSpeaker] = useState<string>('');
 
   useEffect(() => {
     if (config) {
@@ -86,6 +90,36 @@ export default function ConfigPanel({ onClose }: ConfigPanelProps) {
       setMessage({ type: 'success', text: 'Configuration saved successfully' });
     } catch (err) {
       setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to save configuration' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleMicrophoneChange = async (deviceName: string) => {
+    setSaving(true);
+    setMessage(null);
+
+    try {
+      await apiPut('/api/devices/microphone', { device_name: deviceName });
+      setSelectedMicrophone(deviceName);
+      setMessage({ type: 'success', text: `Microphone changed to ${deviceName}` });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to change microphone' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSpeakerChange = async (deviceName: string) => {
+    setSaving(true);
+    setMessage(null);
+
+    try {
+      await apiPut('/api/devices/speaker', { device_name: deviceName });
+      setSelectedSpeaker(deviceName);
+      setMessage({ type: 'success', text: `Speaker changed to ${deviceName}` });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to change speaker' });
     } finally {
       setSaving(false);
     }
@@ -296,29 +330,60 @@ export default function ConfigPanel({ onClose }: ConfigPanelProps) {
         </div>
 
         {/* Device Selection */}
-        {availableDevices && availableDevices.microphones.length > 0 && (
+        {availableDevices && (availableDevices.microphones.length > 0 || availableDevices.speakers.length > 0) && (
           <div className="md:col-span-2">
             <h3 className="text-lg font-semibold mb-4">Device Selection</h3>
             <div className="bg-gray-800 rounded-lg p-4">
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">
-                  Microphone Device
-                </label>
-                <select
-                  value={selectedMicrophone || (currentDevices?.microphone ? availableDevices.microphones.find(d => d.id === currentDevices.microphone.device_id)?.name : '')}
-                  onChange={(e) => handleMicrophoneChange(e.target.value)}
-                  disabled={saving}
-                  className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:border-orange-500 focus:outline-none disabled:opacity-50"
-                >
-                  {availableDevices.microphones.map((mic) => (
-                    <option key={mic.id} value={mic.name}>
-                      {mic.name} ({mic.sample_rate} Hz, {mic.channels} ch)
-                    </option>
-                  ))}
-                </select>
-                {currentDevices?.microphone && (
-                  <div className="text-xs text-gray-500 mt-1">
-                    Currently using: Device ID {currentDevices.microphone.device_id}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Microphone */}
+                {availableDevices.microphones.length > 0 && (
+                  <div>
+                    <label className="block text-sm text-gray-400 mb-2">
+                      Microphone Device
+                    </label>
+                    <select
+                      value={selectedMicrophone || (currentDevices?.microphone ? availableDevices.microphones.find(d => d.id === currentDevices.microphone.device_id)?.name : '')}
+                      onChange={(e) => handleMicrophoneChange(e.target.value)}
+                      disabled={saving}
+                      className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:border-orange-500 focus:outline-none disabled:opacity-50"
+                    >
+                      {availableDevices.microphones.map((mic) => (
+                        <option key={mic.id} value={mic.name}>
+                          {mic.name} ({mic.sample_rate} Hz, {mic.channels} ch)
+                        </option>
+                      ))}
+                    </select>
+                    {currentDevices?.microphone && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        Currently using: Device ID {currentDevices.microphone.device_id}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Speaker */}
+                {availableDevices.speakers.length > 0 && (
+                  <div>
+                    <label className="block text-sm text-gray-400 mb-2">
+                      Speaker/Output Device
+                    </label>
+                    <select
+                      value={selectedSpeaker || (currentDevices?.speaker ? availableDevices.speakers.find(d => d.id === currentDevices.speaker.device_id)?.name : '')}
+                      onChange={(e) => handleSpeakerChange(e.target.value)}
+                      disabled={saving}
+                      className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:border-orange-500 focus:outline-none disabled:opacity-50"
+                    >
+                      {availableDevices.speakers.map((speaker) => (
+                        <option key={speaker.id} value={speaker.name}>
+                          {speaker.name} ({speaker.sample_rate} Hz, {speaker.channels} ch)
+                        </option>
+                      ))}
+                    </select>
+                    {currentDevices?.speaker && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        Currently using: Device ID {currentDevices.speaker.device_id}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
