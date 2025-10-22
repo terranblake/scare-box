@@ -4,6 +4,7 @@ import asyncio
 import pygame
 from typing import Optional
 from pathlib import Path
+import time
 
 
 class SpeakerController:
@@ -14,12 +15,20 @@ class SpeakerController:
         self.current_volume = 0.5
         self.is_playing = False
         self.distortion_level = 0.0
+        self.audio_dir = None
+        self.boo_sound = None
+        self.happy_halloween_sound = None
 
     def discover_and_connect(self, device_address: Optional[str] = None):
-        """Discover and connect to Bluetooth speaker."""
-        # In production, this would use bleak for Bluetooth
-        # For now, we'll use pygame mixer which works with system audio
-        print("Connecting to audio output...")
+        """
+        Discover and connect to Bluetooth speaker.
+
+        Note: Audio will play through system default output device.
+        Make sure your Bluetooth speaker is set as the system default
+        in macOS System Settings > Sound > Output.
+        """
+        print("Audio output will use system default speaker")
+        print("Ensure Bluetooth speaker is connected and set as default output")
         self.is_connected = True
 
     def initialize(self):
@@ -27,56 +36,88 @@ class SpeakerController:
         pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=512)
         print("Audio system initialized")
 
-        # Create placeholder audio files if they don't exist
-        self._ensure_audio_files()
+        # Load audio files
+        self._load_audio_files()
 
-    def _ensure_audio_files(self):
-        """Ensure placeholder audio files exist."""
-        audio_dir = Path(__file__).parent.parent / "audio"
-        audio_dir.mkdir(exist_ok=True)
+    def _load_audio_files(self):
+        """Load scare audio files."""
+        self.audio_dir = Path(__file__).parent.parent / "audio"
+        self.audio_dir.mkdir(exist_ok=True)
 
-        # Note: In production, add actual audio files here
-        self.ambient_music = None
-        self.boo_sound = None
+        # Try to load BOO sound
+        boo_path = self.audio_dir / "boo.wav"
+        if boo_path.exists():
+            self.boo_sound = pygame.mixer.Sound(str(boo_path))
+            print(f"  ✓ Loaded: {boo_path.name}")
+        else:
+            print(f"  ✗ Missing: {boo_path}")
+            print(f"    Place your BOO sound at: {boo_path}")
+
+        # Try to load Happy Halloween sound
+        halloween_path = self.audio_dir / "happy_halloween.wav"
+        if halloween_path.exists():
+            self.happy_halloween_sound = pygame.mixer.Sound(str(halloween_path))
+            print(f"  ✓ Loaded: {halloween_path.name}")
+        else:
+            print(f"  ✗ Missing: {halloween_path}")
+            print(f"    Place your Happy Halloween sound at: {halloween_path}")
 
     def play_ambient_music(self, volume_multiplier: float = 1.0):
-        """Play looping Halloween ambient music."""
-        volume = self.current_volume * volume_multiplier
-        pygame.mixer.music.set_volume(volume)
-
-        # In production, load and play actual ambient music
-        # pygame.mixer.music.load("backend/audio/ambient.mp3")
-        # pygame.mixer.music.play(-1)  # Loop indefinitely
-
+        """
+        User controls ambient music externally (Soundcloud, Spotify, etc).
+        This is just a placeholder - your music plays through the same speaker.
+        """
         self.is_playing = True
-        print(f"Ambient music playing at volume {volume:.2f}")
+        print(f"Ready - Play your ambient music on the laptop (Soundcloud/Spotify/etc)")
+        print(f"  It will route through your Bluetooth speaker (if set as default)")
+        print(f"  Scare sounds will interrupt when triggered")
 
     def apply_distortion(self, intensity: float = 0.0):
-        """Apply audio distortion effect."""
+        """
+        Distortion effect during countdown.
+        Note: This doesn't affect your external music, only system volume.
+        """
         self.distortion_level = intensity
-
-        # Reduce volume as distortion increases
-        distorted_volume = self.current_volume * (1 - intensity * 0.5)
-        pygame.mixer.music.set_volume(distorted_volume)
-
-        # In production, apply real-time pitch shifting and distortion
-        # This would require additional audio processing libraries
+        # Could potentially lower system volume here if needed
+        # For now, just track the distortion level
 
     def play_scare_sequence(self, volume_multiplier: float = 1.0):
-        """Play the scare audio sequence."""
-        # Stop ambient music
-        pygame.mixer.music.stop()
+        """
+        Play the scare audio sequence.
 
-        # Brief silence
-        import time
-        time.sleep(0.3)
+        Sequence:
+        1. Play BOO sound (interrupts your music)
+        2. Delay for screams
+        3. Play HAPPY HALLOWEEN
+        4. Your music resumes naturally
+        """
+        if not self.boo_sound or not self.happy_halloween_sound:
+            print("⚠️  Missing audio files! Printing instead:")
+            print("BOO! 💀")
+            time.sleep(2.0)  # Delay for screams
+            print("HAPPY HALLOWEEN! 🎃")
+            return
 
-        # In production, play actual BOO sound effect
-        # boo_sound = pygame.mixer.Sound("backend/audio/boo.wav")
-        # boo_sound.set_volume(volume_multiplier)
-        # boo_sound.play()
+        # Play BOO sound (this will play OVER your ambient music)
+        self.boo_sound.set_volume(volume_multiplier)
+        self.boo_sound.play()
 
-        print(f"BOO! 🎃 HAPPY HALLOWEEN!")
+        # Wait for BOO to finish
+        while pygame.mixer.get_busy():
+            time.sleep(0.1)
+
+        # Delay for screams/reactions
+        time.sleep(2.0)
+
+        # Play Happy Halloween
+        self.happy_halloween_sound.set_volume(volume_multiplier)
+        self.happy_halloween_sound.play()
+
+        # Wait for Happy Halloween to finish
+        while pygame.mixer.get_busy():
+            time.sleep(0.1)
+
+        print("Scare sequence complete - your ambient music continues")
 
     async def reset_audio(self, duration: float = 5.0):
         """Gradually return to normal ambient music."""
