@@ -4,6 +4,9 @@ import asyncio
 import pygame
 from typing import Optional
 from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from utils.volume_control import VolumeController
 
 
 class SpeakerController:
@@ -17,6 +20,7 @@ class SpeakerController:
         self.audio_dir = None
         self.boo_sound = None
         self.happy_halloween_sound = None
+        self.volume_controller = VolumeController()
 
     def discover_and_connect(self, device_address: Optional[str] = None):
         """
@@ -85,10 +89,11 @@ class SpeakerController:
         Play the scare audio sequence.
 
         Sequence:
-        1. Play BOO sound (interrupts your music)
-        2. Delay for screams
-        3. Play HAPPY HALLOWEEN
-        4. Your music resumes naturally
+        1. Duck (lower) your ambient music volume
+        2. Play BOO sound (now audible over your music)
+        3. Delay for screams
+        4. Play HAPPY HALLOWEEN
+        5. Restore your music volume
         """
         if not self.boo_sound or not self.happy_halloween_sound:
             print("⚠️  Missing audio files! Printing instead:")
@@ -97,8 +102,15 @@ class SpeakerController:
             print("HAPPY HALLOWEEN! 🎃")
             return
 
+        # Save and duck the system volume (makes your music quieter)
+        print("Ducking ambient music volume...")
+        self.volume_controller.save_volume()
+        self.volume_controller.duck_volume(duck_amount=0.2)  # Reduce to 20%
+
+        await asyncio.sleep(0.3)  # Brief moment for volume to adjust
+
         print("Playing BOO sound...")
-        # Play BOO sound (this will play OVER your ambient music)
+        # Play BOO sound (this will now be louder than your ducked music)
         self.boo_sound.set_volume(volume_multiplier)
         self.boo_sound.play()
 
@@ -118,6 +130,10 @@ class SpeakerController:
         # Wait for Happy Halloween to finish
         while pygame.mixer.get_busy():
             await asyncio.sleep(0.1)
+
+        # Restore original volume (your music returns to normal)
+        print("Restoring ambient music volume...")
+        self.volume_controller.restore_volume()
 
         print("Scare sequence complete - your ambient music continues")
 
