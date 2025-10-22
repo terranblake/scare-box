@@ -1,6 +1,6 @@
 """REST API routes for Scare Box."""
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile, File
 from .models import (
     ConfigUpdate,
     ModeUpdate,
@@ -13,6 +13,7 @@ from .models import (
     EventResponse,
 )
 from typing import Optional
+from pathlib import Path
 
 router = APIRouter(prefix="/api")
 
@@ -237,6 +238,64 @@ async def set_speaker_device(request: dict):
             controller.speaker._load_audio_files()
         except:
             pass
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/audio/upload/boo")
+async def upload_boo_audio(file: UploadFile = File(...)):
+    """Upload BOO audio file."""
+    if not controller:
+        raise HTTPException(status_code=500, detail="Controller not initialized")
+
+    # Validate file type
+    if not file.filename.endswith('.wav'):
+        raise HTTPException(status_code=400, detail="Only WAV files are supported")
+
+    try:
+        # Get audio directory
+        audio_dir = Path(__file__).parent.parent / "audio"
+        audio_dir.mkdir(exist_ok=True)
+
+        # Save file
+        file_path = audio_dir / "boo.wav"
+        with open(file_path, "wb") as f:
+            content = await file.read()
+            f.write(content)
+
+        # Reload audio files
+        controller.speaker._load_audio_files()
+
+        return SuccessResponse(success=True, message="BOO audio uploaded successfully")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/audio/upload/happy-halloween")
+async def upload_happy_halloween_audio(file: UploadFile = File(...)):
+    """Upload Happy Halloween audio file."""
+    if not controller:
+        raise HTTPException(status_code=500, detail="Controller not initialized")
+
+    # Validate file type
+    if not file.filename.endswith('.wav'):
+        raise HTTPException(status_code=400, detail="Only WAV files are supported")
+
+    try:
+        # Get audio directory
+        audio_dir = Path(__file__).parent.parent / "audio"
+        audio_dir.mkdir(exist_ok=True)
+
+        # Save file
+        file_path = audio_dir / "happy_halloween.wav"
+        with open(file_path, "wb") as f:
+            content = await file.read()
+            f.write(content)
+
+        # Reload audio files
+        controller.speaker._load_audio_files()
+
+        return SuccessResponse(success=True, message="Happy Halloween audio uploaded successfully")
+    except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 

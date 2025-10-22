@@ -412,6 +412,86 @@ export default function ConfigPanel({ onClose }: ConfigPanelProps) {
           </div>
         )}
 
+        {/* Audio File Upload */}
+        <div className="md:col-span-2">
+          <h3 className="text-lg font-semibold mb-4">Audio Files</h3>
+          <div className="bg-gray-800 rounded-lg p-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* BOO Sound */}
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">
+                  BOO Sound File (.wav)
+                </label>
+                <input
+                  type="file"
+                  accept=".wav"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setSaving(true);
+                      setMessage(null);
+                      try {
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        const response = await fetch('/api/audio/upload/boo', {
+                          method: 'POST',
+                          body: formData,
+                        });
+                        if (!response.ok) throw new Error('Upload failed');
+                        setMessage({ type: 'success', text: 'BOO audio uploaded successfully' });
+                      } catch (err) {
+                        setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to upload audio' });
+                      } finally {
+                        setSaving(false);
+                        e.target.value = '';
+                      }
+                    }
+                  }}
+                  disabled={saving}
+                  className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:border-orange-500 focus:outline-none disabled:opacity-50 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-600 file:text-white hover:file:bg-orange-700"
+                />
+                <div className="text-xs text-gray-500 mt-1">Current: boo.wav</div>
+              </div>
+
+              {/* Happy Halloween Sound */}
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">
+                  Happy Halloween Sound File (.wav)
+                </label>
+                <input
+                  type="file"
+                  accept=".wav"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setSaving(true);
+                      setMessage(null);
+                      try {
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        const response = await fetch('/api/audio/upload/happy-halloween', {
+                          method: 'POST',
+                          body: formData,
+                        });
+                        if (!response.ok) throw new Error('Upload failed');
+                        setMessage({ type: 'success', text: 'Happy Halloween audio uploaded successfully' });
+                      } catch (err) {
+                        setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to upload audio' });
+                      } finally {
+                        setSaving(false);
+                        e.target.value = '';
+                      }
+                    }
+                  }}
+                  disabled={saving}
+                  className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:border-orange-500 focus:outline-none disabled:opacity-50 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-600 file:text-white hover:file:bg-orange-700"
+                />
+                <div className="text-xs text-gray-500 mt-1">Current: happy_halloween.wav</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Save Button */}
         <div className="md:col-span-2">
           <button
