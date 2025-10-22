@@ -102,16 +102,16 @@ class SpeakerController:
             print("HAPPY HALLOWEEN! 🎃")
             return
 
-        # Save current audio state and MUTE your music completely
-        print("Muting ambient music...")
+        # Save current volume and duck it way down
+        print("Ducking system volume...")
         self.volume_controller.save_state()
-        self.volume_controller.mute()
+        self.volume_controller.set_volume(0.05)  # Drop to 5% (barely audible)
 
-        await asyncio.sleep(0.2)  # Brief moment for mute to take effect
+        await asyncio.sleep(0.2)  # Brief moment for volume to adjust
 
-        print("Playing BOO sound...")
-        # Play BOO sound (your music is now SILENT)
-        self.boo_sound.set_volume(volume_multiplier)
+        print("Playing BOO sound at MAX VOLUME...")
+        # Play BOO sound at MAXIMUM volume - will dominate
+        self.boo_sound.set_volume(1.0)  # MAX VOLUME regardless of multiplier
         self.boo_sound.play()
 
         # Wait for BOO to finish
@@ -119,20 +119,20 @@ class SpeakerController:
             await asyncio.sleep(0.1)
 
         print(f"Pausing {scream_delay}s for screams...")
-        # Delay for screams/reactions (music still muted)
+        # Delay for screams/reactions
         await asyncio.sleep(scream_delay)
 
-        print("Playing Happy Halloween...")
-        # Play Happy Halloween (music still muted)
-        self.happy_halloween_sound.set_volume(volume_multiplier)
+        print("Playing Happy Halloween at MAX VOLUME...")
+        # Play Happy Halloween at MAXIMUM volume
+        self.happy_halloween_sound.set_volume(1.0)  # MAX VOLUME
         self.happy_halloween_sound.play()
 
         # Wait for Happy Halloween to finish
         while pygame.mixer.get_busy():
             await asyncio.sleep(0.1)
 
-        # Restore original audio state (unmute your music)
-        print("Unmuting ambient music...")
+        # Restore original volume
+        print("Restoring system volume...")
         self.volume_controller.restore_state()
 
         print("Scare sequence complete - your ambient music continues")

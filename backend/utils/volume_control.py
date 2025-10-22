@@ -1,6 +1,82 @@
-"""System volume control for macOS."""
+"""System volume and music app control for macOS."""
 
 import subprocess
+
+
+class MusicController:
+    """Controls music playback apps on macOS."""
+
+    @staticmethod
+    def pause_spotify():
+        """Pause Spotify if running."""
+        try:
+            subprocess.run(
+                ["osascript", "-e", 'tell application "Spotify" to pause'],
+                check=False,
+                capture_output=True,
+            )
+            print("⏸️  Paused Spotify")
+            return True
+        except:
+            return False
+
+    @staticmethod
+    def play_spotify():
+        """Resume Spotify if running."""
+        try:
+            subprocess.run(
+                ["osascript", "-e", 'tell application "Spotify" to play'],
+                check=False,
+                capture_output=True,
+            )
+            print("▶️  Resumed Spotify")
+            return True
+        except:
+            return False
+
+    @staticmethod
+    def pause_music():
+        """Pause macOS Music app if running."""
+        try:
+            subprocess.run(
+                ["osascript", "-e", 'tell application "Music" to pause'],
+                check=False,
+                capture_output=True,
+            )
+            print("⏸️  Paused Music app")
+            return True
+        except:
+            return False
+
+    @staticmethod
+    def play_music():
+        """Resume macOS Music app if running."""
+        try:
+            subprocess.run(
+                ["osascript", "-e", 'tell application "Music" to play'],
+                check=False,
+                capture_output=True,
+            )
+            print("▶️  Resumed Music app")
+            return True
+        except:
+            return False
+
+    @staticmethod
+    def pause_all():
+        """Pause all known music apps (tries all, doesn't fail)."""
+        print("Pausing all music apps...")
+        MusicController.pause_spotify()
+        MusicController.pause_music()
+        # Add more apps here as needed
+
+    @staticmethod
+    def resume_all():
+        """Resume all known music apps (tries all, doesn't fail)."""
+        print("Resuming all music apps...")
+        MusicController.play_spotify()
+        MusicController.play_music()
+        # Add more apps here as needed
 
 
 class VolumeController:
