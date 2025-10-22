@@ -158,8 +158,12 @@ class SpeakerController:
 
     def shutdown(self):
         """Stop playback and cleanup."""
-        pygame.mixer.music.stop()
-        pygame.mixer.quit()
+        try:
+            pygame.mixer.music.stop()
+            pygame.mixer.quit()
+        except pygame.error:
+            # Mixer not initialized - already stopped
+            pass
         self.is_playing = False
         print("Audio system shutdown")
 

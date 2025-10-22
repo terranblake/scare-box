@@ -39,6 +39,10 @@ class LightController:
         if not self.devices:
             return
 
+        # Turn on all lights first
+        for device in self.devices:
+            device.set_power(True)
+
         # Halloween colors: Orange, Purple, Green
         colors = [
             (30, 65535, 32768, 3500),   # Orange

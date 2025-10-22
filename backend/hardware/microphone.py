@@ -63,6 +63,16 @@ class MicrophoneController:
 
     async def start_listening(self):
         """Start listening to microphone input."""
+        # Close any existing stream first
+        if self.stream:
+            try:
+                self.stream.stop()
+                self.stream.close()
+            except:
+                pass
+            self.stream = None
+            self.is_listening = False
+
         if self.is_listening:
             return
 
