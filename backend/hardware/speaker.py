@@ -95,7 +95,11 @@ class SpeakerController:
     def set_volume(self, volume: float):
         """Set speaker volume (0.0 to 1.0)."""
         self.current_volume = max(0.0, min(1.0, volume))
-        pygame.mixer.music.set_volume(self.current_volume)
+        try:
+            pygame.mixer.music.set_volume(self.current_volume)
+        except pygame.error:
+            # Mixer not initialized - expected during testing
+            pass
 
     def shutdown(self):
         """Stop playback and cleanup."""
