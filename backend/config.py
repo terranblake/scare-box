@@ -21,6 +21,7 @@ class TimingConfig(BaseModel):
     countdown_duration: float = 3.0
     active_duration: float = 2.0
     reset_duration: float = 5.0
+    scream_delay: float = 2.0
 
 
 class HardwareConfig(BaseModel):

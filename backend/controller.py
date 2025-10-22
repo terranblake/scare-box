@@ -185,7 +185,10 @@ class ScareBoxController:
 
         elif state == State.TRICK_ACTIVE:
             # Execute scare
-            self.speaker.play_scare_sequence(intensity["volume"])
+            await self.speaker.play_scare_sequence(
+                volume_multiplier=intensity["volume"],
+                scream_delay=self.config.timing.scream_delay
+            )
             self.lights.trigger_flash(intensity["brightness"])
 
         elif state == State.TRICK_RESET:

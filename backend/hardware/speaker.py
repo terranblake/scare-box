@@ -4,7 +4,6 @@ import asyncio
 import pygame
 from typing import Optional
 from pathlib import Path
-import time
 
 
 class SpeakerController:
@@ -81,7 +80,7 @@ class SpeakerController:
         # Could potentially lower system volume here if needed
         # For now, just track the distortion level
 
-    def play_scare_sequence(self, volume_multiplier: float = 1.0):
+    async def play_scare_sequence(self, volume_multiplier: float = 1.0, scream_delay: float = 2.0):
         """
         Play the scare audio sequence.
 
@@ -94,28 +93,31 @@ class SpeakerController:
         if not self.boo_sound or not self.happy_halloween_sound:
             print("⚠️  Missing audio files! Printing instead:")
             print("BOO! 💀")
-            time.sleep(2.0)  # Delay for screams
+            await asyncio.sleep(scream_delay)  # Delay for screams
             print("HAPPY HALLOWEEN! 🎃")
             return
 
+        print("Playing BOO sound...")
         # Play BOO sound (this will play OVER your ambient music)
         self.boo_sound.set_volume(volume_multiplier)
         self.boo_sound.play()
 
         # Wait for BOO to finish
         while pygame.mixer.get_busy():
-            time.sleep(0.1)
+            await asyncio.sleep(0.1)
 
+        print(f"Pausing {scream_delay}s for screams...")
         # Delay for screams/reactions
-        time.sleep(2.0)
+        await asyncio.sleep(scream_delay)
 
+        print("Playing Happy Halloween...")
         # Play Happy Halloween
         self.happy_halloween_sound.set_volume(volume_multiplier)
         self.happy_halloween_sound.play()
 
         # Wait for Happy Halloween to finish
         while pygame.mixer.get_busy():
-            time.sleep(0.1)
+            await asyncio.sleep(0.1)
 
         print("Scare sequence complete - your ambient music continues")
 
