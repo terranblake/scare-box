@@ -52,7 +52,44 @@ At all times, a fog machine introduces atmospheric effects into the box to hide 
  - Configuration of non-trick to trick delay (may want to delay longer for larger groups holding the lid open)
  - Configuration of trick to non-trick reset timing
 
- ### Application
+## Quick Start
 
-- Server; runs all of the components and logs all events in a standardized format
-- Web-based application with simple controls for operation
+### Backend Setup
+
+```bash
+cd backend
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+Visit:
+- API Docs: http://localhost:8000/docs
+- API: http://localhost:8000/api
+- WebSocket: ws://localhost:8000/ws
+
+### Frontend Setup
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Visit: http://localhost:3000
+
+### Run Tests
+
+```bash
+cd backend
+source venv/bin/activate
+pytest  # 18/18 tests passing
+```
+
+## Architecture
+
+- **Backend**: FastAPI server with REST API, WebSocket streaming, hardware controllers, state machine, event logging
+- **Frontend**: React + TypeScript dashboard with real-time updates, controls, and monitoring
+- **Hardware**: USB-C microphone, LIFX lights (WiFi), Bluetooth speaker
+- **Tests**: Comprehensive unit tests that work without hardware
