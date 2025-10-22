@@ -54,30 +54,31 @@ At all times, a fog machine introduces atmospheric effects into the box to hide 
 
 ## Quick Start
 
-### Backend Setup
+### One Command to Start Everything
 
 ```bash
-cd backend
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-uvicorn main:app --host 0.0.0.0 --port 8000
+./start.sh
 ```
 
-Visit:
-- API Docs: http://localhost:8000/docs
-- API: http://localhost:8000/api
-- WebSocket: ws://localhost:8000/ws
+This will:
+- Install dependencies (if needed)
+- Start backend on http://localhost:8000
+- Start frontend on http://localhost:3000
+- Show live logs
+- Press Ctrl+C to stop
 
-### Frontend Setup
+### Select Audio Device (Optional)
 
 ```bash
-cd frontend
-npm install
-npm run dev
+source backend/venv/bin/activate
+python3 list-devices.py
 ```
 
-Visit: http://localhost:3000
+Then edit `backend/config.yaml` to set your preferred microphone:
+```yaml
+hardware:
+  microphone_device: "Your Device Name"
+```
 
 ### Run Tests
 
