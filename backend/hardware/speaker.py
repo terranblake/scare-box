@@ -32,7 +32,7 @@ class SpeakerController:
 
     def _ensure_audio_files(self):
         """Ensure placeholder audio files exist."""
-        audio_dir = Path("backend/audio")
+        audio_dir = Path(__file__).parent.parent / "audio"
         audio_dir.mkdir(exist_ok=True)
 
         # Note: In production, add actual audio files here

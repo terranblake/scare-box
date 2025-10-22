@@ -2,11 +2,11 @@
 
 import asyncio
 from typing import Optional
-from backend.hardware import MicrophoneController, LightController, SpeakerController, AudioData
-from backend.state_machine import StateMachine, State, Mode, StateChangeEvent
-from backend.utils import event_logger, EventCategory
-from backend.websocket import StreamManager, manager as ws_manager
-from backend.config import config
+from hardware import MicrophoneController, LightController, SpeakerController, AudioData
+from state_machine import StateMachine, State, Mode, StateChangeEvent
+from utils import event_logger, EventCategory
+from websocket import StreamManager, manager as ws_manager
+from config import config
 
 
 class ScareBoxController:

@@ -2,10 +2,10 @@
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from backend.controller import ScareBoxController
-from backend.websocket import manager
-from backend.api import router, set_controller
-from backend.config import config
+from controller import ScareBoxController
+from websocket import manager
+from api import router, set_controller
+from config import config
 
 # Create FastAPI app
 app = FastAPI(

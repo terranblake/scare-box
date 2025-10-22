@@ -1,10 +1,14 @@
 """Data streaming handlers for WebSocket communication."""
 
 import asyncio
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from .manager import ConnectionManager
-from backend.hardware import AudioData
-from backend.utils import Event
-from backend.state_machine import StateChangeEvent
+from hardware import AudioData
+from utils import Event
+from state_machine import StateChangeEvent
 
 
 class StreamManager:
