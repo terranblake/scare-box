@@ -1,17 +1,26 @@
-## Scare Box; an overhaul of the traditional trick-or-treat experience
+# Scare Box
 
-Scare Box is a self-contained shipping box that includes several components to enhance the "scare factor" of trick-or-treating by including visual, auditory, and atmospheric, effects. 
+> An overhaul of the traditional trick-or-treat experience
 
-The box and its components include 2 settings, one for the children which is less scary and a second for adults. Both settings use suite of components to produce an honest scare in those who dare take more than one treat, or if they're simply too loud.
+A web-controlled Halloween scare system with synchronized audio, lighting, and atmospheric effects. Control everything from your phone or laptop with real-time monitoring and manual triggers.
+
+[![Tests](https://img.shields.io/badge/tests-18%20passed-brightgreen)]() [![Python](https://img.shields.io/badge/python-3.9+-blue)]() [![TypeScript](https://img.shields.io/badge/typescript-5.2+-blue)]()
+
+## Overview
+
+Scare Box is a self-contained shipping box that includes several components to enhance the "scare factor" of trick-or-treating by including visual, auditory, and atmospheric effects.
+
+The box and its components include 2 settings: one for children (less scary) and a second for adults (full intensity). Both settings use a suite of components to produce an honest scare for those who dare take more than one treat, or if they're simply too loud.
+
+## Hardware Components
+
+- **Fog Machine** - With its output directed into the shipping box, filling the container and spilling out of the gap in the lid and through randomly placed holes in the box. Controlled by a set timer
+- **LIFX Light Bars** - Producing lighting effects to draw in trick-or-treaters, highlighting the fog as it escapes the container, and producing the visual trick component. Controlled by the laptop via WiFi
+- **USB-C Microphone** - Listens for ambient sound to determine when to initiate the trick. Uses FFT analysis to detect specific frequencies (metallic hinge sounds). Controlled by the laptop
+- **Bluetooth Speaker** - Produces auditory "siren songs" to draw in trick-or-treaters, switching to a loud BOO when triggered. Controlled by the laptop
+- **Laptop** - Orchestrates the complete experience, running the backend server and controlling all components
 
 The treat component is housed inside the container at knee height for an average adult.
-
-The trick component, is a combination of the items listed and detailed below:
-- *Fog machine*; with its output directed into the shipping box, filling the container and spilling out of the gap in the lid and through randomly placed holes in the box. Controlled by a set timer
-- *LIFX Light Bars* (though any addressable led strip would work); producing a lighting effect to draw in trick-or-treaters, highlighting the fog as it escapes the container, and producing the visual trick component detailed below. Controlled by the laptop.
-- *Microphone* (any should work, but one with enough channels and sampling to distinquish between a metallic lid and a fog machine); Listens for ambient sound to determine when to initiate the trick. Controlled by the laptop.
-- *Speaker* (any that has bluetooth or usb capability); produces auditory "siren songs" to draw in trick-or-treaters, switching to a more immediate BOO when instructed. Controlled by the laptop.
-- *Laptop* (anything with 1+ usb ports); orchestrates the complete experience, sending commands to control the auditory and visual experience. Note; fog machine is set on an interval intended to keep the box filled without wasting fluids on the environment.
 
 ### Operation
 
@@ -42,3 +51,8 @@ At all times, a fog machine introduces atmospheric effects into the box to hide 
  - Manual switch of child to adult mode
  - Configuration of non-trick to trick delay (may want to delay longer for larger groups holding the lid open)
  - Configuration of trick to non-trick reset timing
+
+ ### Application
+
+- Server; runs all of the components and logs all events in a standardized format
+- Web-based application with simple controls for operation
