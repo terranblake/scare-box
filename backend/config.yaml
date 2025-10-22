@@ -1,0 +1,33 @@
+mode: child
+
+audio:
+  trigger_frequency_min: 800.0
+  trigger_frequency_max: 1200.0
+  trigger_amplitude_threshold: 0.3
+  sample_rate: 44100
+  chunk_size: 1024
+
+timing:
+  countdown_duration: 3.0
+  active_duration: 2.0
+  reset_duration: 5.0
+
+hardware:
+  microphone_device: null  # Auto-detect
+  speaker_address: null    # Auto-detect
+  lifx_devices: []         # Auto-discover
+
+intensity:
+  child:
+    brightness: 0.6
+    volume: 0.5
+  adult:
+    brightness: 1.0
+    volume: 1.0
+
+server:
+  host: 0.0.0.0
+  port: 8000
+  cors_origins:
+    - http://localhost:3000
+    - http://localhost:5173
