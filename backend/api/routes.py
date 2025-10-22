@@ -155,6 +155,47 @@ async def get_speaker_status():
     return controller.speaker.get_status()
 
 
+@router.get("/devices/available")
+async def get_available_devices():
+    """Get list of available audio input devices."""
+    import sounddevice as sd
+
+    devices = sd.query_devices()
+    input_devices = []
+
+    for i, device in enumerate(devices):
+        if device['max_input_channels'] > 0:
+            input_devices.append({
+                "id": i,
+                "name": device['name'],
+                "channels": device['max_input_channels'],
+                "sample_rate": device['default_samplerate'],
+            })
+
+    return {"microphones": input_devices}
+
+
+@router.put("/devices/microphone")
+async def set_microphone_device(request: dict):
+    """Change the microphone device."""
+    if not controller:
+        raise HTTPException(status_code=500, detail="Controller not initialized")
+
+    device_name = request.get("device_name")
+    if not device_name:
+        raise HTTPException(status_code=400, detail="device_name required")
+
+    # Reinitialize microphone with new device
+    try:
+        controller.microphone.stop_listening()
+        controller.microphone.initialize(device_name)
+        await controller.microphone.start_listening()
+
+        return SuccessResponse(success=True, message=f"Microphone changed to {device_name}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/events")
 async def get_events(limit: Optional[int] = 100):
     """Get event history."""

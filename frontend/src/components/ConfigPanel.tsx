@@ -22,6 +22,11 @@ export default function ConfigPanel({ onClose }: ConfigPanelProps) {
   const [activeDuration, setActiveDuration] = useState(2.0);
   const [resetDuration, setResetDuration] = useState(5.0);
 
+  // Device selection
+  const { data: availableDevices } = useApi<{ microphones: Array<{ id: number; name: string; channels: number; sample_rate: number }> }>('/api/devices/available');
+  const { data: currentDevices } = useApi<any>('/api/devices');
+  const [selectedMicrophone, setSelectedMicrophone] = useState<string>('');
+
   useEffect(() => {
     if (config) {
       setMode(config.mode);
@@ -289,6 +294,37 @@ export default function ConfigPanel({ onClose }: ConfigPanelProps) {
             </div>
           </div>
         </div>
+
+        {/* Device Selection */}
+        {availableDevices && availableDevices.microphones.length > 0 && (
+          <div className="md:col-span-2">
+            <h3 className="text-lg font-semibold mb-4">Device Selection</h3>
+            <div className="bg-gray-800 rounded-lg p-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">
+                  Microphone Device
+                </label>
+                <select
+                  value={selectedMicrophone || (currentDevices?.microphone ? availableDevices.microphones.find(d => d.id === currentDevices.microphone.device_id)?.name : '')}
+                  onChange={(e) => handleMicrophoneChange(e.target.value)}
+                  disabled={saving}
+                  className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:border-orange-500 focus:outline-none disabled:opacity-50"
+                >
+                  {availableDevices.microphones.map((mic) => (
+                    <option key={mic.id} value={mic.name}>
+                      {mic.name} ({mic.sample_rate} Hz, {mic.channels} ch)
+                    </option>
+                  ))}
+                </select>
+                {currentDevices?.microphone && (
+                  <div className="text-xs text-gray-500 mt-1">
+                    Currently using: Device ID {currentDevices.microphone.device_id}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Save Button */}
         <div className="md:col-span-2">
