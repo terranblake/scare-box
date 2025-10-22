@@ -78,7 +78,10 @@ class MicrophoneController:
 
             # Notify listeners
             for callback in self.audio_callbacks:
-                callback(analysis)
+                # Handle both sync and async callbacks
+                result = callback(analysis)
+                if asyncio.iscoroutine(result):
+                    asyncio.create_task(result)
 
             # Check for trigger
             if analysis.triggered:
